@@ -1,24 +1,24 @@
+// src/main.cpp
 #include <iostream>
 #include "allocator.hpp"
 
 int main() {
-    std::cout << "Custom Memory Allocator - Starting Project" << std::endl;
+    std::cout << "=== Step 1: Project Setup ===\n\n";
 
-    MemoryPool pool(1024 * 1024);
-    std::cout << "Pool Start Address: " << pool.getPoolStart() << std::endl;
-    std::cout << "Pool Size: " << pool.getPoolSize() << " bytes" << std::endl;
+    std::cout << "Test 1: Creating 1KB memory pool...\n";
+    MemoryPool small_pool(1024);
+    std::cout << "Pool Start: " << small_pool.getPoolStart() << "\n";
+    std::cout << "Pool Size: " << small_pool.getPoolSize() << " bytes\n\n";
 
-    pool.printBlocks(); // NEW: show block structure
+    std::cout << "Test 2: Creating 1MB memory pool...\n";
+    MemoryPool large_pool(1024 * 1024);
+    std::cout << "Pool Start: " << large_pool.getPoolStart() << "\n";
+    std::cout << "Pool Size: " << large_pool.getPoolSize() << " bytes\n\n";
 
-    std::cout << "\nAllocating 100 bytes..." << std::endl;
-    void* ptr = pool.my_malloc(100);
-    std::cout << "Allocated at: " << ptr << std::endl;
-    pool.printBlocks(); // show blocks after allocation
+    if (small_pool.getPoolStart() != large_pool.getPoolStart()) {
+        std::cout << "SUCCESS: Each pool has unique memory space!\n";
+    }
 
-    std::cout << "\nFreeing the allocated block..." << std::endl;
-    pool.deallocate(ptr);
-    std::cout << "After deallocation:" << std::endl;
-    pool.printBlocks(); // show blocks after deallocation
-
+    std::cout << "\nStep 1 Complete!\n";
     return 0;
 }
