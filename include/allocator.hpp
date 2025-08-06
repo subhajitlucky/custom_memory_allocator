@@ -1,5 +1,5 @@
-// include/allocator.hpp
-// Step 2: Memory Pool with Block Metadata
+// include/allocator.hpp  
+// Step 3: Memory Pool with my_malloc
 
 #ifndef CUSTOM_ALLOCATOR_HPP
 #define CUSTOM_ALLOCATOR_HPP
@@ -13,21 +13,21 @@ private:
     void* memory_start;
     size_t pool_size;
 
-    // Step 2: Block metadata structure
     struct BlockHeader {
-        size_t size;          // Size of user data (excluding header)
-        bool is_free;         // true = available, false = in use
-        BlockHeader* next;    // Pointer to next block
+        size_t size;
+        bool is_free;
+        BlockHeader* next;
     };
 
-    BlockHeader* head;        // First block in our linked list
+    BlockHeader* head;
 
 public:
     MemoryPool(size_t size);
     ~MemoryPool();
     void* getPoolStart();
     size_t getPoolSize();
-    void printBlocks();       // Step 2: Show block structure
+    void printBlocks();
+    void* my_malloc(size_t size);    // Step 3: Our malloc implementation
 };
 
 #endif
