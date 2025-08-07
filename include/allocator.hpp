@@ -1,5 +1,5 @@
 // include/allocator.hpp  
-// Step 3: Memory Pool with my_malloc
+// Step 4: Memory Pool with my_malloc and my_free
 
 #ifndef CUSTOM_ALLOCATOR_HPP
 #define CUSTOM_ALLOCATOR_HPP
@@ -28,6 +28,7 @@ public:
     size_t getPoolSize();
     void printBlocks();
     void* my_malloc(size_t size);    // Step 3: Our malloc implementation
+    void my_free(void* ptr);         // Step 4: Our free implementation
 };
 
 #endif

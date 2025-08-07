@@ -125,3 +125,69 @@ void* MemoryPool::my_malloc(size_t size) {
     std::cout << "  ❌ No suitable block found for " << size << " bytes\n";
     return nullptr;
 }
+
+// Step 4: Our custom free implementation
+void MemoryPool::my_free(void* ptr) {
+    std::cout << "🔍 my_free(" << ptr << ") called\n";
+    
+    // Step 1: Handle null pointer
+    if (!ptr) {
+        std::cout << "  ⚠️ Warning: Cannot free null pointer\n";
+        return;
+    }
+    
+    // Step 2: Calculate BlockHeader address from user pointer
+    // User pointer = BlockHeader + sizeof(BlockHeader)
+    // So: BlockHeader = User pointer - sizeof(BlockHeader)
+    BlockHeader* block_to_free = reinterpret_cast<BlockHeader*>(
+        reinterpret_cast<char*>(ptr) - sizeof(BlockHeader)
+    );
+    
+    std::cout << "  📍 Block to free at: " << block_to_free << "\n";
+    
+    // Step 3: Basic validation - check if this looks like a valid block
+    // (In a real allocator, we'd do more thorough validation)
+    if (block_to_free < memory_start || 
+        reinterpret_cast<char*>(block_to_free) >= 
+        reinterpret_cast<char*>(memory_start) + pool_size) {
+        std::cout << "  ❌ Error: Pointer outside memory pool bounds\n";
+        return;
+    }
+    
+    // Step 4: Check if block is already free (double-free detection)
+    if (block_to_free->is_free) {
+        std::cout << "  ⚠️ Warning: Block is already free! (double-free detected)\n";
+        return;
+    }
+    
+    // Step 5: Mark block as free
+    block_to_free->is_free = true;
+    std::cout << "  ✅ Marked block as free (size: " << block_to_free->size << " bytes)\n";
+    
+    // Step 6: Coalescing - merge with adjacent free blocks
+    std::cout << "  🔗 Looking for adjacent free blocks to merge...\n";
+    
+    // Walk through all blocks to find and merge adjacent free blocks
+    BlockHeader* current = head;
+    while (current && current->next) {
+        // If current block and next block are both free, merge them
+        if (current->is_free && current->next->is_free) {
+            std::cout << "    🔄 Merging block at " << current 
+                      << " (size:" << current->size 
+                      << ") with next block at " << current->next 
+                      << " (size:" << current->next->size << ")\n";
+                      
+            // Merge: current block absorbs the next block
+            current->size += sizeof(BlockHeader) + current->next->size;
+            current->next = current->next->next;  // Skip the merged block
+            
+            std::cout << "    ✅ Merged into single block of size: " << current->size << " bytes\n";
+            
+            // Don't advance current - check again in case there are more adjacent free blocks
+        } else {
+            current = current->next;
+        }
+    }
+    
+    std::cout << "  🎉 Free operation completed!\n";
+}
